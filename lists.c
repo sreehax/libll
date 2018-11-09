@@ -2,8 +2,10 @@
 #include<stdlib.h>
 #include<string.h>
 #include<sys/types.h>
+#include<sys/mman.h>
 list_t *list_new() {
-	return calloc(1, sizeof(list_t));
+	//return calloc(1, sizeof(list_t));
+	return mmap(NULL, sizeof(list_t), PROT_READ|PROT_WRITE, MAP_SHARED|MAP_ANONYMOUS, -1, 0);
 }
 size_t list_add(list_t *list, char *data) {
 	if(list == NULL) {
@@ -58,12 +60,12 @@ int list_delete(list_t *list, size_t n) {
 		iter = iter->next;
 	}
 	if(iter->next->next == NULL) {
-		free(iter->next);
+		munmap(iter->next, sizeof(list_t));//free(iter->next);
 		iter->next = NULL;
 		return 0;
 	} else {
 		list_t *backup = iter->next->next;
-		free(iter->next);
+		munmap(iter->next, sizeof(list_t));
 		iter->next = backup;
 		return 0;
 	}
