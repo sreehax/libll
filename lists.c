@@ -42,12 +42,13 @@ int list_get(list_t *list, char *data, size_t n) {
 	return 0;
 }
 ssize_t list_find(list_t *list, char *data) {
-	size_t i;
-	for(i = 0; memcmp(list->data, data, 18) != 0; i++) {
-		if(list->next == NULL) {
+	ssize_t i;
+	list_t *iter = list;
+	for(i = 0; memcmp(iter->data, data, 18) != 0; i++) {
+		if(iter->next == NULL) {
 			return -1;
 		}
-		list = list->next;
+		iter = iter->next;
 	}
 	return i - 1;
 }
