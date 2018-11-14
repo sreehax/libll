@@ -50,7 +50,7 @@ ssize_t list_find(list_t *list, char *data) {
 		}
 		iter = iter->next;
 	}
-	return i - 1;
+	return i;
 }
 int list_delete(list_t *list, size_t n) {
 	if(list == NULL) {
