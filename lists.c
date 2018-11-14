@@ -3,9 +3,13 @@
 #include<string.h>
 #include<sys/types.h>
 #include<sys/mman.h>
+
+#include     <stdio.h>
 list_t *list_new() {
 	//return calloc(1, sizeof(list_t));
-	return mmap(NULL, sizeof(list_t), PROT_READ|PROT_WRITE, MAP_SHARED|MAP_ANONYMOUS, -1, 0);
+	list_t *new = mmap(NULL, sizeof(list_t), PROT_READ|PROT_WRITE, MAP_SHARED|MAP_ANONYMOUS, -1, 0);
+	memset(new, 0, sizeof(list_t));
+	return new;
 }
 size_t list_add(list_t *list, char *data) {
 	if(list == NULL) {
@@ -21,7 +25,7 @@ size_t list_add(list_t *list, char *data) {
 	list_t *new = list_new();
 	memcpy(new->data, data, 18);
 	iter->next = new;
-	return i;
+	return i + 1;
 }
 int list_get(list_t *list, char *data, size_t n) {
 	if(list == NULL) {
@@ -53,20 +57,20 @@ int list_delete(list_t *list, size_t n) {
 	}
 	list_t *iter = list;
 	size_t i;
-	for(i = 0; i < n; i++) {
-		if(iter->next->next == NULL) {
+	for(i = 0; i < n - 1; i++) {
+		iter = iter->next;
+		if(iter->next == NULL) {
 			return -1;
 		}
-		iter = iter->next;
 	}
-	if(iter->next->next == NULL) {
-		munmap(iter->next, sizeof(list_t));//free(iter->next);
+	if(iter->next->next == NULL) { //if the last item is being deleted
+		munmap(iter->next, sizeof(list_t));
 		iter->next = NULL;
 		return 0;
 	} else {
-		list_t *backup = iter->next->next;
+		list_t *new = iter->next->next;
 		munmap(iter->next, sizeof(list_t));
-		iter->next = backup;
+		iter->next = new;
 		return 0;
 	}
 }
